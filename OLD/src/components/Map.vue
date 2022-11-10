@@ -1,14 +1,12 @@
 <template>
-  <div id="app">
-    <MglMap :accessToken="accessToken" :mapStyle="mapStyle" container="mainMap">
-      <MglGeojsonLayer
-        :sourceId="geoJsonSource.data.id"
-        :source="geoJsonSource"
-        layerId="somethingSomething"
-        :layer="geoJsonLayer"
-      />
-    </MglMap>
-  </div>
+  <MglMap :accessToken="accessToken" :mapStyle="mapStyle" container="mainMap">
+    <MglGeojsonLayer
+      :sourceId="geoJsonSource.data.id"
+      :source="geoJsonSource"
+      layerId="somethingSomething"
+      :layer="geoJsonLayer"
+    />
+  </MglMap>
 </template>
 
 <script>
@@ -16,6 +14,7 @@ import Mapbox from 'mapbox-gl'
 import { MglMap, MglGeojsonLayer } from 'vue-mapbox/dist/vue-mapbox.umd.js'
 
 export default {
+  name: 'Map',
   components: {
     MglMap,
     MglGeojsonLayer
