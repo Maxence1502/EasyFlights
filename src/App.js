@@ -4,7 +4,6 @@ import Search from './Components/Search';
 import AirportInfo from "./Components/AirportInfo";
 
 function App() {
-
   return (
       <div>
         <Map/>

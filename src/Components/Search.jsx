@@ -1,26 +1,42 @@
 import { useState } from 'react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox } from '@headlessui/react'
-
-const people = [
-    { id: 1, name: 'Leslie Alexander' },
-    { id: 2, name: 'Leslie Alexandere' }
-]
+import axios from "axios";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function Search(props) {
+export default function Search() {
     const [query, setQuery] = useState('')
     const [selectedPerson, setSelectedPerson] = useState(null)
 
-    const filteredPeople =
-        query === ''
-            ? people
-            : people.filter((person) => {
-                return person.name.toLowerCase().includes(query.toLowerCase())
-            })
+    const searchAirports = (search) => {
+        const options = {
+            method: 'GET',
+            url: 'https://aerodatabox.p.rapidapi.com/airports/search/term',
+            params: {
+                q: search,
+                limit: '25'
+            },
+            headers: {
+                'X-RapidAPI-Key': '57144c3fefmsha2412c30ecad75ep18d754jsnce65c801c15d',
+                'X-RapidAPI-Host': 'aerodatabox.p.rapidapi.com'
+            }
+        };
+
+        return axios.request(options).then(function (response) {
+            console.log(response.data.items);
+            return response.data.items;
+        }).catch(function (error) {
+            return [];
+        });
+    }
+
+    const filteredAirports =
+        query.length < 3
+            ? []
+            : searchAirports(query)
 
     return (
         <Combobox as="div" className="absolute w-1/3 top-10 left-1/3 transform -translateX-1/3 " value={selectedPerson} onChange={setSelectedPerson}>
@@ -34,12 +50,12 @@ export default function Search(props) {
                     <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                 </Combobox.Button>
 
-                {filteredPeople.length > 0 && (
+                {filteredAirports.length > 0 && (
                     <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                        {filteredPeople.map((person) => (
+                        {filteredAirports.map((airport) => (
                             <Combobox.Option
-                                key={person.id}
-                                value={person}
+                                key={airport.icao}
+                                value={airport}
                                 className={({ active }) =>
                                     classNames(
                                         'relative cursor-default select-none py-2 pl-8 pr-4',
@@ -49,7 +65,7 @@ export default function Search(props) {
                             >
                                 {({ active, selected }) => (
                                     <>
-                                        <span className={classNames('block truncate', selected && 'font-semibold')}>{person.name}</span>
+                                        <span className={classNames('block truncate', selected && 'font-semibold')}>{airport.name}</span>
 
                                         {selected && (
                                             <span
@@ -58,8 +74,8 @@ export default function Search(props) {
                                                     active ? 'text-white' : 'text-indigo-600'
                                                 )}
                                             >
-                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                      </span>
+                                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                          </span>
                                         )}
                                     </>
                                 )}
