@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 import { Dialog, Menu, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
@@ -7,12 +7,10 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function AirportInfo() {
-    const [open, setOpen] = useState(true)
-
+export default function AirportInfo({ visible, setVisible }) {
     return (
-        <Transition.Root show={open} as={Fragment}>
-            <Dialog as="div" className="relative z-10" onClose={setOpen}>
+        <Transition.Root show={visible} as={Fragment}>
+            <Dialog as="div" className="relative z-10" onClose={setVisible}>
                 <div className="fixed inset-0" />
 
                 <div className="fixed inset-0 overflow-hidden">
@@ -38,7 +36,7 @@ export default function AirportInfo() {
                                                     <button
                                                         type="button"
                                                         className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500"
-                                                        onClick={() => setOpen(false)}
+                                                        onClick={() => setVisible(false)}
                                                     >
                                                         <span className="sr-only">Close panel</span>
                                                         <XMarkIcon className="h-6 w-6" aria-hidden="true" />
@@ -63,8 +61,8 @@ export default function AirportInfo() {
                                                                 <div className="flex items-center">
                                                                     <h3 className="text-xl font-bold text-gray-900 sm:text-2xl">Ashley Porter</h3>
                                                                     <span className="ml-2.5 inline-block h-2 w-2 flex-shrink-0 rounded-full bg-green-400">
-                                    <span className="sr-only">Online</span>
-                                  </span>
+                                                <span className="sr-only">Online</span>
+                                              </span>
                                                                 </div>
                                                                 <p className="text-sm text-gray-500">@ashleyporter</p>
                                                             </div>
