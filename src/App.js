@@ -2,6 +2,8 @@ import './App.css';
 import Search from './Components/Search';
 import AirportInfo from './Components/AirportInfo'
 import React, {useEffect, useRef, useState} from 'react'
+import axios from "axios";
+
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 mapboxgl.accessToken = 'pk.eyJ1IjoibWF4ZW5jZTE1MDIiLCJhIjoiY2w4b2dodHc2MDg0bDNucnVmcTJ2Y3hpOCJ9.IHfK8wgoNngWo4MwghLWDg';
 
@@ -12,6 +14,7 @@ function App() {
   const [lat, setLat] = useState(47,67);
   const [zoom, setZoom] = useState(5);
   const [airportInfoModal, airportInfoOpen] = useState(false);
+  let allMapMarkers = [];
 
   const searchButton = () => {
     airportInfoOpen(true);
@@ -27,26 +30,29 @@ function App() {
     });
 
     (map.current).addControl(new mapboxgl.NavigationControl(), "bottom-right");
+    (map.current).addControl(
+      new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true
+        },
+        trackUserLocation: true,
+        showUserHeading: true
+      })
+    );
 
-    new mapboxgl.Marker()
-      .setLngLat([2.35, 48.85])
-      .setPopup(
-        new mapboxgl.Popup({ offset: 25 })
-          .setHTML(
-            `<h3>Paris</h3><p>Y'a la Tour Eiffel</p>`
-          )
-      )
-      .addTo(map.current);
-
-    new mapboxgl.Marker({ color: 'black' })
-      .setLngLat([0, 51.5])
-      .setPopup(
-        new mapboxgl.Popup({ offset: 25 })
-          .setHTML(
-            `<h3>London</h3><p>What a beautiful city</p>`
-          )
-      )
-      .addTo(map.current);
+    /*axios.request({
+      method: 'GET',
+      url: 'https://world-airports-directory.p.rapidapi.com/v1/airports',
+      params: {page: '1', sortBy: 'name:asc', limit: '20'},
+      headers: {
+        'X-RapidAPI-Key': '57144c3fefmsha2412c30ecad75ep18d754jsnce65c801c15d',
+        'X-RapidAPI-Host': 'world-airports-directory.p.rapidapi.com'
+      }
+    }).then(function (response) {
+      console.log(response.data);
+    }).catch(function (error) {
+      console.error(error);
+    });*/
   }, [] );
 
   useEffect(() => {
@@ -56,8 +62,67 @@ function App() {
       setLat(map.current.getCenter().lat.toFixed(2));
     });
 
-    map.current.on('click', () => {
-      console.log("clicked");
+    const popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    });
+
+    /*map.current.on('mouseenter', 'places', (e) => {
+// Change the cursor style as a UI indicator.
+      map.current.getCanvas().style.cursor = 'pointer';
+
+// Copy coordinates array.
+      const coordinates = e.features[0].geometry.coordinates.slice();
+      const description = e.features[0].properties.description;
+
+      // Ensure that if the map is zoomed out such that multiple
+      // copies of the feature are visible, the popup appears
+      // over the copy being pointed to.
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+
+      // Populate the popup and set its coordinates
+      // based on the feature found.
+      popup.setLngLat(coordinates).setHTML(description).addTo(map.current);
+    });
+
+    map.current.on('mouseleave', 'places', () => {
+      map.getCanvas().style.cursor = '';
+      popup.remove();
+    });*/
+
+    map.current.on('click', (e) => {
+      if (e) {
+        axios.request({
+          method: 'GET',
+          url: `https://aerodatabox.p.rapidapi.com/airports/search/location/${e.lngLat.lat}/${e.lngLat.lng}/km/250/10`,
+          params: {withFlightInfoOnly: 'true'},
+          headers: {
+            'X-RapidAPI-Key': '57144c3fefmsha2412c30ecad75ep18d754jsnce65c801c15d',
+            'X-RapidAPI-Host': 'aerodatabox.p.rapidapi.com'
+          }
+        }).then(function (response) {
+          allMapMarkers.forEach(marker => {
+            marker.remove();
+          });
+
+          (response.data.items).forEach(airport => {
+            allMapMarkers.push(new mapboxgl.Marker()
+              .setLngLat([airport.location.lon, airport.location.lat])
+              .setPopup(
+                new mapboxgl.Popup({offset: 25})
+                  .setHTML(
+                    `<h2>${airport.municipalityName}</h2><p>${airport.name}</p>`
+                  )
+              )
+              .addTo(map.current)
+            );
+          });
+        }).catch(function (error) {
+          console.error(error);
+        });
+      }
     });
   }, []);
 

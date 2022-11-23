@@ -51,7 +51,7 @@ export default function AirportInfo({ visible, setVisible }) {
                                                     <div className="relative h-40 sm:h-56">
                                                         <img
                                                             className="absolute h-full w-full object-cover"
-                                                            src="https://images.unsplash.com/photo-1501031170107-cfd33f0cbdcc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&h=600&q=80"
+                                                            src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Gull_portrait_ca_usa.jpg"
                                                             alt=""
                                                         />
                                                     </div>
@@ -61,8 +61,8 @@ export default function AirportInfo({ visible, setVisible }) {
                                                                 <div className="flex items-center">
                                                                     <h3 className="text-xl font-bold text-gray-900 sm:text-2xl">Ashley Porter</h3>
                                                                     <span className="ml-2.5 inline-block h-2 w-2 flex-shrink-0 rounded-full bg-green-400">
-                                                <span className="sr-only">Online</span>
-                                              </span>
+                                                                        <span className="sr-only">Online</span>
+                                                                    </span>
                                                                 </div>
                                                                 <p className="text-sm text-gray-500">@ashleyporter</p>
                                                             </div>

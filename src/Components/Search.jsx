@@ -38,11 +38,12 @@ export default function Search({ searchButton }) {
 
     return (
         <Combobox as="div" className="flex justify-between absolute w-1/3 top-10 left-1/3 transform -translateX-1/3 " value={selectedPerson} onChange={setSelectedPerson}>
-            <div className="relative mt-1">
+            <div className="relative mt-1 w-full">
                 <Combobox.Input
                     className="w-full rounded-full border border-gray-300 bg-white py-4 pl-6 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
-                    onChange={(event) => {setQuery(event.target.value); searchAirports(event.target.value);} }
-                    displayValue={(person) => person?.name || "Search"}
+                    onChange={(event) => {setQuery(event.target.value)/*; searchAirports(event.target.value);*/} }
+                    displayValue={(airport) => airport?.name}
+                    placeholder={"Entrez le point de départ"}
                 />
                 <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                     <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
