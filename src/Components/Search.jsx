@@ -1,20 +1,20 @@
-import {useRef, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox } from '@headlessui/react'
 import axios from "axios";
+import mapboxgl from 'mapbox-gl'
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function Search({ searchButton }) {
-    const [query, setQuery] = useState('')
-    const [selectedPerson, setSelectedPerson] = useState(null)
-    let matchingAirports = [];
+export default function Search({ map, query, setQuery, searchButton, allMapMarkers, setAllMapMarkers }) {
+    const [selectedAirport, setSelectedAirport] = useState(null)
+    let [matchingAirports, setMatchingAirpots] = useState([]);
 
     const searchAirports = (search) => {
         if (search.length < 3) {
-            matchingAirports = []
+            setMatchingAirpots([])
         } else {
             axios.request({
                 method: 'GET',
@@ -28,31 +28,47 @@ export default function Search({ searchButton }) {
                     'X-RapidAPI-Host': 'aerodatabox.p.rapidapi.com'
                 }
             }).then(function (response) {
-                matchingAirports = response.data.items;
+                setMatchingAirpots(response.data.items);
                 console.log(matchingAirports);
             }).catch(function (error) {
-                matchingAirports = [];
+                setMatchingAirpots([]);
             });
         }
     }
 
+    useEffect(() => {
+        if (selectedAirport) {
+            let marker = new mapboxgl.Marker({ color: "black", size: "large" })
+              .setLngLat([selectedAirport.location.lon, selectedAirport.location.lat])
+              .setPopup(
+                new mapboxgl.Popup({offset: 25})
+                  .setHTML(
+                    `<h2>${selectedAirport.municipalityName}</h2><p>${selectedAirport.shortName}</p>`
+                  )
+              )
+              .addTo(map.current);
+
+            const markerDiv = marker.getElement();
+            markerDiv.addEventListener('mouseenter', () => { marker.togglePopup() });
+            markerDiv.addEventListener('mouseleave', () => { marker.togglePopup() });
+        }
+    }, [selectedAirport]);
+
     return (
-        <Combobox as="div" className="flex justify-between absolute w-1/3 top-10 left-1/3 transform -translateX-1/3 " value={selectedPerson} onChange={setSelectedPerson}>
+        <Combobox as="div" className="flex justify-between absolute w-1/2 top-10 left-1/4 transform -translateX-1/4 " value={selectedAirport} onChange={setSelectedAirport}>
             <div className="relative mt-1 w-full">
                 <Combobox.Input
                     className="w-full rounded-full border border-gray-300 bg-white py-4 pl-6 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
-                    onChange={(event) => {setQuery(event.target.value)/*; searchAirports(event.target.value);*/} }
-                    displayValue={(airport) => airport?.name}
+                    onChange={(event) => {setQuery(event.target.value); searchAirports(event.target.value);} }
+                    displayValue={(airport) => airport?.shortName}
                     placeholder={"Entrez le point de départ"}
                 />
                 <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                     <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                 </Combobox.Button>
 
-                {console.log(matchingAirports.length)}
                 {matchingAirports.length > 0 && (
                   <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-
                       {matchingAirports.map((airport) => (
                         <Combobox.Option
                           key={airport.icao}
@@ -67,7 +83,7 @@ export default function Search({ searchButton }) {
                             {({ active, selected }) => (
                               <>
                                   <div className="flex">
-                                      <span className={classNames('truncate', selected && 'font-semibold')}>{airport.name}</span>
+                                      <span className={classNames('truncate', selected && 'font-semibold')}>{airport.shortName}</span>
                                       <span
                                         className={classNames(
                                           'ml-2 truncate text-gray-500',
