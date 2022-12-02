@@ -8,19 +8,18 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-export default function Search({ map, query, setQuery, searchButton, allMapMarkers, setAllMapMarkers }) {
-    const [selectedAirport, setSelectedAirport] = useState(null)
+export default function Search({ map, query, setQuery, searchButton, selectedAirport, setSelectedAirport, allMapMarkers, setAllMapMarkers }) {
     let [matchingAirports, setMatchingAirpots] = useState([]);
 
-    const searchAirports = (search) => {
-        if (search.length < 3) {
+    useEffect(() => {
+        if (query.length < 3) {
             setMatchingAirpots([])
         } else {
             axios.request({
                 method: 'GET',
                 url: 'https://aerodatabox.p.rapidapi.com/airports/search/term',
                 params: {
-                    q: search,
+                    q: query,
                     limit: '25'
                 },
                 headers: {
@@ -29,12 +28,11 @@ export default function Search({ map, query, setQuery, searchButton, allMapMarke
                 }
             }).then(function (response) {
                 setMatchingAirpots(response.data.items);
-                console.log(matchingAirports);
             }).catch(function (error) {
                 setMatchingAirpots([]);
             });
         }
-    }
+    }, [query]);
 
     useEffect(() => {
         if (selectedAirport) {
@@ -48,6 +46,8 @@ export default function Search({ map, query, setQuery, searchButton, allMapMarke
               )
               .addTo(map.current);
 
+            allMapMarkers.push(marker);
+
             const markerDiv = marker.getElement();
             markerDiv.addEventListener('mouseenter', () => { marker.togglePopup() });
             markerDiv.addEventListener('mouseleave', () => { marker.togglePopup() });
@@ -59,8 +59,8 @@ export default function Search({ map, query, setQuery, searchButton, allMapMarke
             <div className="relative mt-1 w-full">
                 <Combobox.Input
                     className="w-full rounded-full border border-gray-300 bg-white py-4 pl-6 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
-                    onChange={(event) => {setQuery(event.target.value); searchAirports(event.target.value);} }
-                    displayValue={(airport) => airport?.shortName}
+                    onChange={(event) => {setQuery(event.target.value);} }
+                    displayValue={(airport) => airport ? airport.name : query}
                     placeholder={"Entrez le point de départ"}
                 />
                 <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
@@ -83,7 +83,7 @@ export default function Search({ map, query, setQuery, searchButton, allMapMarke
                             {({ active, selected }) => (
                               <>
                                   <div className="flex">
-                                      <span className={classNames('truncate', selected && 'font-semibold')}>{airport.shortName}</span>
+                                      <span className={classNames('truncate', selected && 'font-semibold')}>{airport.name}</span>
                                       <span
                                         className={classNames(
                                           'ml-2 truncate text-gray-500',
