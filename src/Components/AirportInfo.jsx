@@ -3,7 +3,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import axios from 'axios'
 
-export default function AirportInfo({ visible, setVisible, searchButton, icao, selectedAirport, setSelectedAirport }) {
+export default function AirportInfo({ visible, setVisible, searchButton, icao, setSelectedAirport }) {
     let [airportInfo, setAirportInfo] = useState([]);
 
     useEffect(() => {
@@ -14,11 +14,21 @@ export default function AirportInfo({ visible, setVisible, searchButton, icao, s
             method: 'GET',
             url: `https://airport-info.p.rapidapi.com/airport?icao=${icao}`,
             headers: {
-                'X-RapidAPI-Key': '57144c3fefmsha2412c30ecad75ep18d754jsnce65c801c15d',
+                'X-RapidAPI-Key': 'b017861f42msh4e5e8f472ab1870p1e6c39jsn166b5da95fe8',
                 'X-RapidAPI-Host': 'airport-info.p.rapidapi.com'
             }
         }).then(function (response) {
             setAirportInfo(response.data);
+
+            setSelectedAirport({
+                icao: response.data.icao,
+                location: {
+                    lon: response.data.longitude,
+                    lat: response.data.latitude,
+                },
+                municipalityName: response.data.location,
+                shortName: response.data.name
+            });
         }).catch(function (error) {
             console.error(error);
         });
@@ -111,7 +121,7 @@ export default function AirportInfo({ visible, setVisible, searchButton, icao, s
                                                     </div>
                                                 </dl>
                                             </div>
-                                            <div className="w-11/12 fixed bottom-5">
+                                            <div className="ml-5 w-11/12 fixed bottom-5">
                                                 <button
                                                   type="button"
                                                   className="inline-flex w-full flex-shrink-0 items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:flex-1"
