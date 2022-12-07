@@ -20,7 +20,8 @@ export default function Search({ map, query, setQuery, searchButton, selectedAir
                 url: 'https://aerodatabox.p.rapidapi.com/airports/search/term',
                 params: {
                     q: query,
-                    limit: '25'
+                    limit: '25',
+                    withFlightInfoOnly: 'true'
                 },
                 headers: {
                     'X-RapidAPI-Key': 'b017861f42msh4e5e8f472ab1870p1e6c39jsn166b5da95fe8',
@@ -58,19 +59,19 @@ export default function Search({ map, query, setQuery, searchButton, selectedAir
     }, [selectedAirport]);
 
     return (
-        <Combobox as="div" className="flex justify-between absolute w-1/2 top-10 left-1/4 transform -translateX-1/4" value={selectedAirport} onChange={setSelectedAirport}>
+        <Combobox as="div" className="flex justify-between absolute w-1/2 top-10 left-1/4 transform -translateX-1/4 flex-col md:flex-row" value={selectedAirport} onChange={setSelectedAirport}>
             <Combobox.Input
-                className="w-full rounded-full border border-gray-300 bg-white py-4 pl-6 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
+                className="w-full mt-1 rounded-full border border-gray-300 bg-white py-4 pl-6 pr-10 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm"
                 onChange={(event) => {setQuery(event.target.value);} }
                 displayValue={(airport) => airport ? airport.name : query}
-                placeholder={"Entrez le point de départ"}
+                placeholder={"Point de départ"}
             />
             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
                 <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
             </Combobox.Button>
 
             {matchingAirports.length > 0 && (
-              <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <Combobox.Options className="absolute z-10 mt-16 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                   {matchingAirports.map((airport) => (
                     <Combobox.Option
                       key={airport.icao}
@@ -116,7 +117,7 @@ export default function Search({ map, query, setQuery, searchButton, selectedAir
             <Listbox value={selectedFlightTime} onChange={setSelectedFlightTime}>
                 {({ open }) => (
                   <>
-                      <div className="relative ml-2">
+                      <div className="relative ml-2 mt-1">
                           <Listbox.Button className="relative w-full h-full cursor-default rounded-full border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
                               <span className="block truncate">{selectedFlightTime.name}</span>
                               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
@@ -172,7 +173,7 @@ export default function Search({ map, query, setQuery, searchButton, selectedAir
 
             <button
               type="button"
-              className="ml-2 inline-flex items-center px-3.5 py-2 border border-transparent text-sm leading-4 font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="ml-2 mt-1 text-center inline-flex items-center px-7 py-2 border border-transparent text-sm leading-4 font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               onClick={searchButton}
             >
                 Rechercher

@@ -9,8 +9,8 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibWF4ZW5jZTE1MDIiLCJhIjoiY2w4b2dodHc2MDg0bDNuc
 
 const flightTime = [
     { distance: 500, name: '< 1h' },
-    { distance: 1200, name: '1h < 2h' },
-    { distance: 3600, name: '2h < 5h' },
+    { distance: 1200, name: '< 2h' },
+    { distance: 3600, name: '< 5h' },
     { distance: 14000, name: '> 5h' }
 ]
 
@@ -98,7 +98,7 @@ function App() {
                         route.destination.location.lat, route.destination.location.lon
                       )
 
-                        console.log(route.destination.name + " : " + currentAirport.location.lat + " " + currentAirport.location.lon + " | " + route.destination.location.lat + " " + route.destination.location.lon + " > " + distance);
+                        //console.log(route.destination.name + " : " + currentAirport.location.lat + " " + currentAirport.location.lon + " | " + route.destination.location.lat + " " + route.destination.location.lon + " > " + distance);
 
                         if (distance <= selectedFlightTime.distance) {
                             let red = (distance / selectedFlightTime.distance) * 256;
@@ -219,6 +219,11 @@ function App() {
                         'X-RapidAPI-Host': 'aerodatabox.p.rapidapi.com'
                     }
                 }).then(function (response) {
+                    var mapLayer = (map.current).getLayer('route');
+                    if (typeof mapLayer !== 'undefined') {
+                        (map.current).removeLayer('route').removeSource('route');
+                    }
+
                     allMapMarkers.forEach(marker => {
                         marker.remove();
                     });
@@ -252,6 +257,11 @@ function App() {
 
     return (
         <div>
+            <img
+                className="absolute z-50 mt-10 ml-10 max-w-[250px] invisible lg:visible"
+                src="logo.png"
+                alt=""
+            />
             <div className="sidebar">
                 Longitude: {lng} | Latitude: {lat}
             </div>
